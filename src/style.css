@@ -1,0 +1,17 @@
+body {
+  background-image: url('./assets/images/Back.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  backdrop-filter: blur(5px);
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.glass-card {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.4);
+}
