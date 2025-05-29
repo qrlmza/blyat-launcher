@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="h-screen overflow-hidden font-sans">
+    <div class="h-full flex flex-col">
+        <div class="flex-1 flex">
+            <!-- Sidebar -->
+            <div class="w-16 glass-effect border-r border-gray-600 flex flex-col items-center py-4 space-y-6">
+                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center bg-opacity-30">
+                    <img src="../assets/images/logo.png" alt="Logo" class="w-6 h-6">
+                </div>
+
+                <a href="../index.html" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:bg-opacity-30 rounded-lg">
+                    <i class="fas fa-play text-xl"></i>
+                </a>
+
+                <a href="./account.html" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:bg-opacity-30 rounded-lg">
+                    <i class="fas fa-user text-xl"></i>
+                </a>
+
+                <div class="flex-1"></div>
+
+                <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-700 hover:bg-opacity-30 rounded-lg">
+                    <i class="fas fa-right-from-bracket text-xl"></i>
+                </button>
+                <a href="./settings.html" class="w-10 h-10 flex items-center justify-center text-white bg-gray-700 bg-opacity-50 rounded-lg">
+                    <i class="fas fa-cog text-xl"></i>
+                </a>
+            </div>
+
+            <!-- Main Panel -->
+            <div class="flex-1 p-6 space-y-6">
+                <!-- <div class="flex items-center justify-between mb-8">
+                    <h1 class="text-white text-4xl font-bold">Paramètres</h1>
+                </div> -->
+
+                <!-- Paramètres du Launcher -->
+                <div class="glass-card rounded-lg p-6">
+                    <h2 class="text-white text-2xl font-bold mb-6">Paramètres du Launcher</h2>
+                    
+                    <!-- RAM Settings -->
+                    <div class="mb-8">
+                        <h3 class="text-white text-xl mb-4">Allocation de RAM</h3>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-gray-400 text-sm">Mémoire allouée</label>
+                            <span class="text-green-400 text-sm font-medium"><span id="ramValue">4</span> GB</span>
+                        </div>
+                        <div class="glass-card p-6 rounded relative">
+                            <div class="mb-6">
+                                <div class="relative mb-3">
+                                    <div class="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                                        <div id="ramFill" class="h-full bg-gradient-to-r from-green-700 to-green-500 transition-all duration-150 ease-in-out rounded-full" style="width: 14.3%"></div>
+                                    </div>
+                                    <div class="absolute -bottom-2.5 inset-x-0 flex justify-between">
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <input type="range" 
+                                    min="2" 
+                                    max="16" 
+                                    step="2" 
+                                    value="4" 
+                                    class="absolute inset-x-6 top-6 w-[calc(100%-48px)] opacity-0 cursor-pointer z-10"
+                                    id="ramSlider"
+                                    oninput="updateRamValue(this)">
+                            </div>
+                            <div class="flex justify-between px-1 text-xs text-gray-400">
+                                <span>2GB</span>
+                                <span>4GB</span>
+                                <span>6GB</span>
+                                <span>8GB</span>
+                                <span>10GB</span>
+                                <span>12GB</span>
+                                <span>14GB</span>
+                                <span>16GB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function updateRamValue(slider) {
+                            const value = parseInt(slider.value);
+                            document.getElementById('ramValue').textContent = value;
+                            
+                            // Met à jour la barre de progression
+                            const percent = ((value - slider.min) / (slider.max - slider.min)) * 100;
+                            document.getElementById('ramFill').style.width = percent + '%';
+
+                            // Met à jour la couleur des marqueurs
+                            const markers = document.querySelectorAll('.bg-gray-600\\/30');
+                            const activeIndex = (value - 2) / 2;
+                            markers.forEach((marker, index) => {
+                                if (index <= activeIndex) {
+                                    marker.classList.replace('bg-gray-600/30', 'bg-green-500/30');
+                                } else {
+                                    marker.classList.replace('bg-green-500/30', 'bg-gray-600/30');
+                                }
+                            });
+                        }
+
+                        // Initialisation
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const slider = document.getElementById('ramSlider');
+                            updateRamValue(slider);
+                        });
+                    </script>
+
+                    <!-- Java Path -->
+                    <div class="mb-8">
+                        <h3 class="text-white text-xl mb-4">Java</h3>
+                        <div class="flex space-x-4">
+                            <div class="flex-1">
+                                <label class="block text-gray-400 text-sm mb-2">Chemin de Java</label>
+                                <div class="flex">
+                                    <input type="text" class="flex-1 glass-card p-2 rounded-l text-white" placeholder="C:\Program Files\Java\jre1.8.0_xxx\bin\java.exe" readonly>
+                                    <button class="glass-card px-4 rounded-r text-white hover:bg-gray-700">
+                                        <i class="fas fa-folder-open"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Version Settings -->
+                    <div class="mb-8">
+                        <h3 class="text-white text-xl mb-4">Version du jeu</h3>
+                        <div class="flex space-x-4">
+                            <div class="flex-1">
+                                <label class="block text-gray-400 text-sm mb-2">Version installée</label>
+                                <div class="glass-card p-2 rounded text-green-400">
+                                    v1.0.0
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-gray-400 text-sm mb-2">Dernière mise à jour</label>
+                                <div class="glass-card p-2 rounded text-white">
+                                    29/05/2025
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="flex justify-end space-x-4">
+                        <button class="glass-card text-white px-6 py-2 rounded hover:bg-red-700 hover:bg-opacity-30">
+                            <i class="fas fa-trash-alt mr-2"></i>
+                            Réinitialiser
+                        </button>
+                        <button class="glass-card text-white px-6 py-2 rounded hover:bg-green-700 hover:bg-opacity-30">
+                            <i class="fas fa-save mr-2"></i>
+                            Sauvegarder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
