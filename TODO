@@ -1,0 +1,13 @@
+- Système de logs (actions du launcher, erreurs, etc.)
+- Gestion avancée des paramètres (RAM, chemin Java, etc.)
+- Téléchargement et installation automatique du modpack
+- Lancement de Minecraft avec les bons arguments (RAM, Java...)
+- Détection automatique de l'exécutable Java ou sélection manuelle
+- Affichage du temps de jeu réel (si possible)
+- Amélioration de la gestion des erreurs réseau
+- Ajout d'animations/transitions UI
+- Optimisation de la gestion des sessions (expiration, reconnexion...)
+- Internationalisation (si besoin plus tard)
+- Correction de l'affichage du nombre de joueurs (affiche 0 dans tous les cas)
+- Corriger les dates dans la pages d'infos utilisateur (1 jour de moins)
+- 

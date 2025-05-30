@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="h-screen overflow-hidden font-sans">
+<body class="h-screen overflow-hidden font-sans" onload="requireAuth()">
     <!-- Window Frame -->
     <div class="h-full flex flex-col">
 
@@ -16,8 +16,8 @@
         <div class="flex-1 flex">
             <!-- Sidebar -->
             <div class="w-16 glass-effect border-r border-gray-600 flex flex-col items-center py-4 space-y-6">
-                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center bg-opacity-30">
-                    <img src="./assets/images/logo.png" alt="Logo" class="w-6 h-6">
+                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center bg-opacity-30" id="avatarContainer">
+                    <img src="./assets/images/logo.png" alt="Logo" class="w-6 h-6" id="launcherLogo">
                 </div>
 
                 <a href="./index.html" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:bg-opacity-30 rounded-lg">
@@ -35,7 +35,7 @@
 
                 <div class="flex-1"></div>
 
-                <button class="w-10 h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-700 hover:bg-opacity-30 rounded-lg">
+                <button class="w-10 h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-700 hover:bg-opacity-30 rounded-lg" onclick="logout()">
                     <i class="fas fa-right-from-bracket text-xl"></i>
                 </button>
                 <a href="./pages/settings.html" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:bg-opacity-30 rounded-lg">
@@ -93,6 +93,84 @@
             </div>
         </div>
     </div>
+    <script src="auth-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('blyat_user'));
+            if (user) {
+
+                // Affichage de la dernière connexion
+                const lastConnectEl = document.getElementById('lastConnect');
+                if (lastConnectEl) {
+                    let dateStr = user.last_connect;
+                    if (typeof dateStr === 'string' && dateStr.length >= 10) {
+                        let datePart = dateStr.split('T')[0].split(' ')[0];
+                        const [year, month, day] = datePart.split('-');
+                        lastConnectEl.textContent = `${day}/${month}/${year}`;
+                    } else {
+                        lastConnectEl.textContent = 'N/A';
+                    }
+                }
+                
+                // Affichage du temps de jeu (à personnaliser si tu as l'info)
+                const playTimeEl = document.getElementById('playTime');
+                if (playTimeEl) playTimeEl.textContent = 'À venir';
+
+                // Affichage de l'avatar Minecraft à la place du logo (Crafatar avec UUID)
+                const avatarContainer = document.getElementById('avatarContainer');
+                if (avatarContainer) {
+                    fetch(`https://api.mojang.com/users/profiles/minecraft/${user.username}`)
+                        .then(res => res.ok ? res.json() : null)
+                        .then(data => {
+                            if (data && data.id) {
+                                const img = new Image();
+                                img.src = `https://crafatar.com/avatars/${data.id}?size=40&overlay`;
+                                img.alt = 'Avatar Minecraft';
+                                img.className = 'rounded';
+                                img.title = user.username;
+                                img.onerror = function() {
+                                    avatarContainer.innerHTML = "<img src='./assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                                };
+                                avatarContainer.innerHTML = '';
+                                avatarContainer.appendChild(img);
+                            } else {
+                                avatarContainer.innerHTML = "<img src='./assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                            }
+                        })
+                        .catch(() => {
+                            avatarContainer.innerHTML = "<img src='./assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                        });
+                }
+            }
+            // Vérification de l'état du serveur Minecraft
+            const serverIp = '82.65.92.225'; // Remplace par ton IP ou domaine
+            const serverPort = 25565; // Remplace par ton port si différent
+            fetch(`https://api.mcsrvstat.us/2/${serverIp}${serverPort !== 25565 ? ':' + serverPort : ''}`)
+                .then(res => res.json())
+                .then(data => {
+                    const serversStatsEl = document.getElementById('serversStats');
+                    if (serversStatsEl) {
+                        if (data.online) {
+                            serversStatsEl.textContent = `En ligne avec ${data.players.online} joueurs`;
+                            serversStatsEl.classList.remove('text-red-400');
+                            serversStatsEl.classList.add('text-green-400');
+                        } else {
+                            serversStatsEl.textContent = 'Hors ligne';
+                            serversStatsEl.classList.remove('text-green-400');
+                            serversStatsEl.classList.add('text-red-400');
+                        }
+                    }
+                })
+                .catch(() => {
+                    const serversStatsEl = document.getElementById('serversStats');
+                    if (serversStatsEl) {
+                        serversStatsEl.textContent = 'Erreur de connexion';
+                        serversStatsEl.classList.remove('text-green-400');
+                        serversStatsEl.classList.add('text-red-400');
+                    }
+                });
+        });
+    </script>
 </body>
 
 </html>

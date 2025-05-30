@@ -15,10 +15,7 @@
   "description": "Launcher for the BlyatCraft modded server",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "server": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm start\""
+    "start": "electron ."
   },
   "repository": {
     "type": "git",

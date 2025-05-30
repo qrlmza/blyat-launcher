@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
 </head>
-<body class="h-screen overflow-hidden font-sans">
+<body class="h-screen overflow-hidden font-sans" onload="requireAuth()">
     <div class="h-full flex flex-col">
         <div class="flex-1 flex">
             <!-- Sidebar -->
             <div class="w-16 glass-effect border-r border-gray-600 flex flex-col items-center py-4 space-y-6">
-                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center bg-opacity-30">
-                    <img src="../assets/images/logo.png" alt="Logo" class="w-6 h-6">
+                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center bg-opacity-30" id="avatarContainer">
+                    <img src="../assets/images/logo.png" alt="Logo" class="w-6 h-6" id="launcherLogo">
                 </div>
 
                 <a href="../index.html" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 hover:bg-opacity-30 rounded-lg">
@@ -26,7 +26,7 @@
 
                 <div class="flex-1"></div>
 
-                <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-700 hover:bg-opacity-30 rounded-lg">
+                <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-700 hover:bg-opacity-30 rounded-lg" onclick="logout()">
                     <i class="fas fa-right-from-bracket text-xl"></i>
                 </button>
                 <a href="./settings.html" class="w-10 h-10 flex items-center justify-center text-white bg-gray-700 bg-opacity-50 rounded-lg">
@@ -168,5 +168,37 @@
             </div>
         </div>
     </div>
+
+    <script src="../auth-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Affichage de l'avatar Minecraft à la place du logo (Crafatar avec UUID)
+            const user = JSON.parse(localStorage.getItem('blyat_user'));
+            const avatarContainer = document.getElementById('avatarContainer');
+            if (user && avatarContainer) {
+                fetch(`https://api.mojang.com/users/profiles/minecraft/${user.username}`)
+                    .then(res => res.ok ? res.json() : null)
+                    .then(data => {
+                        if (data && data.id) {
+                            const img = new Image();
+                            img.src = `https://crafatar.com/avatars/${data.id}?size=40&overlay`;
+                            img.alt = 'Avatar Minecraft';
+                            img.className = 'rounded';
+                            img.title = user.username;
+                            img.onerror = function() {
+                                avatarContainer.innerHTML = "<img src='../assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                            };
+                            avatarContainer.innerHTML = '';
+                            avatarContainer.appendChild(img);
+                        } else {
+                            avatarContainer.innerHTML = "<img src='../assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                        }
+                    })
+                    .catch(() => {
+                        avatarContainer.innerHTML = "<img src='../assets/images/logo.png' alt='Logo' class='w-6 h-6' id='launcherLogo'>";
+                    });
+            }
+        });
+    </script>
 </body>
 </html>
