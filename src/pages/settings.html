@@ -65,7 +65,7 @@
                                         <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
                                         <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
                                         <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
-                                        <div class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
+                                        class="w-1 h-2 bg-gray-600/30 rounded-full"></div>
                                     </div>
                                 </div>
                                 <input type="range" 
@@ -155,6 +155,10 @@
 
                     <!-- Boutons d'action -->
                     <div class="flex justify-end space-x-4">
+                        <button class="glass-card text-white px-6 py-2 rounded hover:bg-blue-700 hover:bg-opacity-30" id="downloadModpackBtn">
+                            <i class="fas fa-download mr-2"></i>
+                            Télécharger le Modpack
+                        </button>
                         <button class="glass-card text-white px-6 py-2 rounded hover:bg-red-700 hover:bg-opacity-30">
                             <i class="fas fa-trash-alt mr-2"></i>
                             Réinitialiser
@@ -164,10 +168,23 @@
                             Sauvegarder
                         </button>
                     </div>
+                    <div id="modpackProgressContainer" class="w-full mt-4 hidden">
+    <div class="w-full bg-gray-700 rounded-full h-4">
+        <div id="modpackProgressBar" class="bg-blue-600 h-4 rounded-full transition-all duration-200" style="width: 0%"></div>
+    </div>
+    <div id="modpackProgressText" class="text-white text-center mt-2 text-sm"></div>
+</div>
+<div id="modpackAlert" class="w-full mt-4 hidden"></div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Notification Popup -->
+<div id="modpackToast" class="fixed top-6 right-6 z-50 min-w-[220px] max-w-xs bg-gray-900 text-white rounded-lg shadow-lg px-4 py-3 flex items-center space-x-3 transition-all duration-300" style="display:none;">
+    <i id="modpackToastIcon" class="fas fa-info-circle text-xl"></i>
+    <span id="modpackToastMsg" class="flex-1"></span>
+</div>
 
     <script src="../auth-client.js"></script>
     <script>
@@ -199,6 +216,76 @@
                     });
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const { downloadModpack, extractModpack } = require('../modpack');
+            const path = require('path');
+            const os = require('os');
+            const fs = require('fs');
+            const downloadBtn = document.getElementById('downloadModpackBtn');
+            const progressContainer = document.getElementById('modpackProgressContainer');
+            const progressBar = document.getElementById('modpackProgressBar');
+            const progressText = document.getElementById('modpackProgressText');
+            const alertDiv = document.getElementById('modpackAlert');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', async () => {
+                    alertDiv.classList.add('hidden');
+                    progressContainer.classList.remove('hidden');
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Téléchargement du modpack...';
+                    showToast('Téléchargement du modpack...', 'info');
+                    const destFolder = path.join(os.homedir(), 'BlyatLauncher', 'modpack');
+                    fs.mkdirSync(destFolder, { recursive: true });
+                    try {
+                        const zipPath = await downloadModpack(destFolder, (done, total) => {
+                            const percent = total ? Math.floor((done/total)*100) : 0;
+                            progressBar.style.width = percent + '%';
+                            progressText.textContent = `Téléchargement : ${percent}%`;
+                            if (percent % 10 === 0 && percent !== 0) {
+                                showToast(`Téléchargement : ${percent}%`, 'info');
+                            }
+                        });
+                        progressBar.style.width = '100%';
+                        progressText.textContent = 'Extraction du modpack...';
+                        showToast('Extraction du modpack...', 'info');
+                        await extractModpack(zipPath, destFolder);
+                        progressContainer.classList.add('hidden');
+                        alertDiv.className = 'w-full mt-4 bg-green-600 text-white text-center rounded p-2';
+                        alertDiv.textContent = 'Modpack téléchargé et extrait avec succès !';
+                        alertDiv.classList.remove('hidden');
+                        showToast('Modpack téléchargé et extrait avec succès !', 'success');
+                    } catch (e) {
+                        progressContainer.classList.add('hidden');
+                        alertDiv.className = 'w-full mt-4 bg-red-600 text-white text-center rounded p-2';
+                        alertDiv.textContent = 'Erreur : ' + e.message;
+                        alertDiv.classList.remove('hidden');
+                        showToast('Erreur : ' + e.message, 'error');
+                    }
+                });
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('modpackToast');
+            const toastMsg = document.getElementById('modpackToastMsg');
+            const toastIcon = document.getElementById('modpackToastIcon');
+            toastMsg.textContent = message;
+            toast.style.display = 'flex';
+            // Style selon le type
+            if (type === 'success') {
+                toast.className = 'fixed top-6 right-6 z-50 min-w-[220px] max-w-xs bg-green-600 text-white rounded-lg shadow-lg px-4 py-3 flex items-center space-x-3 transition-all duration-300';
+                toastIcon.className = 'fas fa-check-circle text-xl text-white';
+            } else if (type === 'error') {
+                toast.className = 'fixed top-6 right-6 z-50 min-w-[220px] max-w-xs bg-red-600 text-white rounded-lg shadow-lg px-4 py-3 flex items-center space-x-3 transition-all duration-300';
+                toastIcon.className = 'fas fa-times-circle text-xl text-white';
+            } else {
+                toast.className = 'fixed top-6 right-6 z-50 min-w-[220px] max-w-xs bg-gray-900 text-white rounded-lg shadow-lg px-4 py-3 flex items-center space-x-3 transition-all duration-300';
+                toastIcon.className = 'fas fa-info-circle text-xl text-white';
+            }
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        }
     </script>
 </body>
 </html>
